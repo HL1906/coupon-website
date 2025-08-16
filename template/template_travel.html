@@ -1,0 +1,587 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旅行优惠 - 省钱出行</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 16px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 375px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1d1d1f;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(45deg, #007aff, #5856d6);
+            border-radius: 2px;
+            margin-right: 12px;
+        }
+
+        .deal-item {
+            display: block;
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid #f2f2f7;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .deal-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .deal-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+            border-color: #007aff;
+        }
+
+        .deal-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(0,122,255,0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .deal-item:hover::before {
+            opacity: 1;
+        }
+
+        .deal-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .deal-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #1d1d1f;
+        }
+
+        .deal-info p {
+            font-size: 14px;
+            color: #86868b;
+            font-weight: 400;
+        }
+
+        .deal-badge {
+            background: linear-gradient(45deg, #ff3b30, #ff9500);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .ride-section {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .ride-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .ride-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid #f2f2f7;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ride-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .ride-card h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1d1d1f;
+        }
+
+        .ride-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .ride-link {
+            display: block;
+            background: #f2f2f7;
+            color: #007aff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .ride-link:hover {
+            background: #007aff;
+            color: white;
+        }
+
+        .special-offer {
+            background: linear-gradient(45deg, #ff3b30, #ff9500);
+            color: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .special-offer h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .special-offer p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+
+        .special-link {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .special-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+
+        /* 二维码弹窗样式 */
+        .qr-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .qr-modal.show {
+            display: flex;
+        }
+
+        .qr-content {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            max-width: 320px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            animation: modalSlideIn 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .qr-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f2f2f7;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 15px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .qr-close:hover {
+            background: #e5e5ea;
+        }
+
+        .qr-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1d1d1f;
+        }
+
+        .qr-image {
+            width: 200px;
+            height: 200px;
+            background: #f8f8f8;
+            border: 2px dashed #d1d1d6;
+            border-radius: 16px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #86868b;
+        }
+
+        .qr-instructions {
+            font-size: 14px;
+            color: #86868b;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .qr-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .qr-btn {
+            background: #007aff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+
+        .qr-btn:hover {
+            background: #0056b3;
+        }
+
+        .qr-btn.secondary {
+            background: #f2f2f7;
+            color: #007aff;
+        }
+
+        .qr-btn.secondary:hover {
+            background: #e5e5ea;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @media (max-width: 320px) {
+            .container {
+                padding: 0 12px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .ride-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header fade-in">
+            <h1>💰 旅行优惠</h1>
+            <p>精选超值优惠，省钱出行必备</p>
+        </div>
+
+        <div class="card fade-in" style="animation-delay: 0.1s;">
+            <div class="card-title">✈️ 机票优惠</div>
+            <a href="https://kzurl16.cn/7ELJb3" class="deal-item">
+                <div class="deal-content">
+                    <div class="deal-info">
+                        <h3>机票无门槛红包</h3>
+                        <p>立即可用，全球航线适用</p>
+                    </div>
+                    <div class="deal-badge">100元</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="card fade-in" style="animation-delay: 0.2s;">
+            <div class="card-title">🏨 住宿优惠</div>
+            <a href="https://kzurl14.cn/7EXwT3" class="deal-item">
+                <div class="deal-content">
+                    <div class="deal-info">
+                        <h3>酒店立减优惠</h3>
+                        <p>全国酒店通用，即订即享</p>
+                    </div>
+                    <div class="deal-badge">最高400元</div>
+                </div>
+            </a>
+            
+            <a href="https://kzurl19.cn/7EgJW9" class="deal-item">
+                <div class="deal-content">
+                    <div class="deal-info">
+                        <h3>同程酒店特价</h3>
+                        <p>精选优质酒店，超值体验</p>
+                    </div>
+                    <div class="deal-badge">低至69元</div>
+                </div>
+            </a>
+            
+            <div class="deal-item" onclick="showMeituanQR()">
+                <div class="deal-content">
+                    <div class="deal-info">
+                        <h3>美团民宿优惠</h3>
+                        <p>点击查看二维码，扫码领取</p>
+                    </div>
+                    <div class="deal-badge">100元</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ride-section fade-in" style="animation-delay: 0.3s;">
+            <div class="card-title">🚗 出行打车</div>
+            
+            <div class="ride-grid">
+                <div class="ride-card">
+                    <h4>🐷 花小猪出行</h4>
+                    <div class="ride-links">
+                        <a href="https://kzurl18.cn/7EXHs3" class="ride-link">新用户立减8元</a>
+                        <a href="https://kurl06.cn/7EXHe3" class="ride-link">老用户专享</a>
+                    </div>
+                </div>
+                
+                <div class="ride-card">
+                    <h4>🚕 滴滴出行</h4>
+                    <div class="ride-links">
+                        <a href="https://kzurl17.cn/7EXHYn" class="ride-link">新用户12元内免单</a>
+                        <a href="https://kurl04.cn/7EXucM" class="ride-link">新用户12元以上</a>
+                    </div>
+                </div>
+                
+                <div class="ride-card">
+                    <h4>🌟 T3出行</h4>
+                    <div class="ride-links">
+                        <a href="https://kurl03.cn/7EXsbO" class="ride-link">新用户专属优惠</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="special-offer">
+                <h3>🇭🇰 滴滴香港专享</h3>
+                <p>内地领取，香港使用</p>
+                <a href="https://kzurl12.cn/7EljCD" class="special-link">5折出行</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 二维码弹窗 -->
+    <div class="qr-modal" id="qrModal">
+        <div class="qr-content">
+            <button class="qr-close" onclick="closeQRCode()">×</button>
+            <div class="qr-title">🏠 美团民宿100元红包</div>
+            <div class="qr-image" id="qrImage">
+                📱
+            </div>
+            <div class="qr-instructions">
+                长按保存二维码图片<br>
+                在微信中扫一扫打开领取优惠
+            </div>
+            <div class="qr-buttons">
+                <button class="qr-btn secondary" onclick="saveQRCode()">保存图片</button>
+                <button class="qr-btn" onclick="closeQRCode()">知道了</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 显示美团民宿二维码弹窗
+        function showMeituanQR() {
+            const modal = document.getElementById('qrModal');
+            const qrImage = document.getElementById('qrImage');
+            
+            // 尝试加载二维码图片
+            const img = new Image();
+            img.onload = function() {
+                qrImage.innerHTML = '';
+                qrImage.appendChild(img);
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'contain';
+                img.style.borderRadius = '12px';
+            };
+            img.onerror = function() {
+                qrImage.innerHTML = '<div style="color: #86868b; font-size: 14px; line-height: 1.4; padding: 20px;">🏠<br>美团民宿二维码<br><small style="color: #007aff;">请将 mingsu.jpg 放在同目录</small></div>';
+            };
+            img.src = './mingsu.jpg';
+            
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // 关闭二维码弹窗
+        function closeQRCode() {
+            const modal = document.getElementById('qrModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+        
+        // 保存二维码图片
+        function saveQRCode() {
+            const img = document.querySelector('#qrImage img');
+            if (img && img.complete) {
+                // 创建下载链接
+                const link = document.createElement('a');
+                link.href = img.src;
+                link.download = '美团民宿100元红包.jpg';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                alert('图片正在加载中，请稍候再试...');
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 渐进加载动画
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+            // 添加点击反馈效果
+            const clickableItems = document.querySelectorAll('.deal-item, .ride-link, .special-link');
+            clickableItems.forEach(item => {
+                item.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                item.addEventListener('touchend', function() {
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 100);
+                });
+            });
+            
+            // 点击弹窗背景关闭
+            document.getElementById('qrModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeQRCode();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>优惠券聚合-内部入口</title>
+    <link rel="stylesheet" href="./assets/styles/common.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 16px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .container { max-width: 560px; margin: 0 auto; position: relative; z-index: 1; }
+        .header { text-align: center; color: #fff; margin-bottom: 18px; }
+        .header h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .header p { font-size: 15px; opacity: 0.9; margin-bottom: 6px; }
+
+        .top-nav { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+        .nav-btn { background: rgba(255,255,255,0.22); color: #fff; border: 1px solid rgba(255,255,255,0.35); padding: 10px 14px; border-radius: 12px; font-weight: 700; cursor: pointer; backdrop-filter: blur(8px); transition: all 0.2s ease; }
+        .nav-btn:hover { background: rgba(255,255,255,0.32); transform: translateY(-1px); }
+
+        .stats-bar {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 18px;
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-around;
+            margin-top: 12px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .stat-item { text-align: center; color: #fff; }
+        .stat-number { font-size: 18px; font-weight: 700; display: block; }
+        .stat-label { font-size: 12px; opacity: 0.85; }
+
+        .platform-section {
+            background: #fff;
+            border-radius: 18px;
+            padding: 22px;
+            margin-bottom: 18px;
+            box-shadow: 0 10px 28px rgba(0,0,0,0.15);
+        }
+        .platform-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .platform-info { display: flex; align-items: center; }
+        .platform-icon {
+            width: 42px; height: 42px; border-radius: 12px; margin-right: 12px;
+            display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700;
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
+        }
+        .platform-title { font-size: 18px; font-weight: 600; color: #333; }
+        .platform-subtitle { font-size: 13px; color: #666; margin-top: 2px; }
+        .platform-badge { background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: #fff; padding: 6px 12px; border-radius: 14px; font-size: 12px; font-weight: 600; }
+
+        .coupon-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+        .coupon-item {
+            background: linear-gradient(135deg, #f8f9ff 0%, #eef1ff 100%);
+            border: 2px solid #e5e9ff;
+            border-radius: 14px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .coupon-item:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,0,0,0.12); }
+        .coupon-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+        .coupon-title { font-size: 16px; font-weight: 600; color: #333; }
+        .coupon-amount { background: #ff4757; color: #fff; padding: 4px 8px; border-radius: 8px; font-size: 12px; font-weight: 600; margin-left: 8px; }
+        .coupon-desc { font-size: 14px; color: #666; line-height: 1.5; margin-bottom: 10px; }
+        .coupon-footer { display: flex; align-items: center; justify-content: space-between; }
+        .tag { display: inline-block; color: #fff; font-size: 11px; padding: 4px 10px; border-radius: 12px; font-weight: 600; }
+        .tag.hot { background: linear-gradient(135deg, #ff6b6b, #ee5a52); }
+        .tag.new { background: linear-gradient(135deg, #4ecdc4, #44a08d); }
+        .tag.stack { background: linear-gradient(135deg, #45b7d1, #2196F3); }
+        .tag.top { background: linear-gradient(135deg, #FFD700, #FFA500); color: #333; }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #4caf50; margin-right: 6px; }
+        .coupon-status { font-size: 12px; color: #999; display: flex; align-items: center; }
+
+        .browser-warning {
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
+            border: 2px solid #f44336;
+            border-radius: 12px;
+            padding: 14px; margin-bottom: 14px; font-size: 14px; color: #c62828;
+            display: none;
+        }
+
+        .success-toast { position: fixed; top: 28px; left: 50%; transform: translateX(-50%); background: #4caf50; color: #fff; padding: 10px 18px; border-radius: 22px; font-size: 14px; z-index: 1001; display: none; }
+
+        .floating-help {
+            position: fixed; bottom: 26px; right: 26px; width: 54px; height: 54px; border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 22px; cursor: pointer; box-shadow: 0 8px 20px rgba(255,107,107,0.4); z-index: 999;
+        }
+
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; padding: 20px; }
+        .modal-content { background: #fff; border-radius: 18px; padding: 24px; max-width: 420px; margin: 20px auto; position: relative; top: 50%; transform: translateY(-50%); text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .modal-title { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 14px; }
+        .btn { background: linear-gradient(135deg, #007AFF, #0056cc); color: #fff; border: none; border-radius: 12px; padding: 12px 22px; font-size: 15px; cursor: pointer; margin: 6px; font-weight: 600; }
+        .btn-secondary { background: linear-gradient(135deg, #6c757d, #5a6268); }
+        .coupon-code { background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 12px; padding: 14px; font-family: 'SF Mono', Menlo, Consolas, monospace; font-size: 13px; margin: 14px 0; word-break: break-all; }
+
+        @media (max-width: 480px) {
+            .container { padding: 0 8px; }
+            .modal { padding: 10px; }
+            .modal-content { margin: 10px auto; padding: 18px; max-width: calc(100vw - 20px); }
+        }
+    </style>
+    <script src="./assets/scripts/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            animateStats();
+            updateOnlineStatus();
+            checkBrowserEnvironment();
+        });
+
+        function animateStats() {
+            const counters = document.querySelectorAll('.stat-number');
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-target') || '0');
+                const duration = 1600;
+                const increment = Math.max(1, Math.floor(target / (duration / 16)));
+                let current = 0;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) { current = target; clearInterval(timer); }
+                    counter.textContent = current + (counter.dataset.suffix || '');
+                }, 16);
+            });
+        }
+
+        function updateOnlineStatus() {
+            const dots = document.querySelectorAll('.status-dot');
+            dots.forEach(dot => { dot.style.background = navigator.onLine ? '#4caf50' : '#ff5722'; });
+        }
+
+        function checkBrowserEnvironment() {
+            const isWeixin = /micromessenger/i.test(navigator.userAgent);
+            if (isWeixin) {
+                const warn = document.getElementById('browserWarning');
+                if (warn) warn.style.display = 'block';
+            }
+        }
+
+        function openInNewTabOrSelf(url) {
+            try {
+                const w = window.open(url, '_blank');
+                setTimeout(() => { if (!w || w.closed || typeof w.closed === 'undefined') { window.location.href = url; } }, 800);
+            } catch { window.location.href = url; }
+        }
+
+        // 入口导航跳转
+        function goToHome() { window.location.href = './index.html'; }
+        function goToTravel() { window.location.href = './travel.html'; }
+        function goToMovie() { window.location.href = './movie.html'; }
+
+        // 饿了么闪购功能
+        function openElemeNewUser() {
+            showSuccessToast('正在复制新用户免单口令...');
+            const coupon = '67 HU7405   1:/BKts4j63NTZ£欢闪购新用户可领首单免单';
+            showCopyModal('饿了么新用户免单', coupon, '淘宝闪购');
+        }
+
+        function openElemeMilkTea() {
+            showSuccessToast('正在复制奶茶优惠口令...');
+            const coupon = '77 HU7405   2:/7CH44j66EhP✔欢领最高15元大额红包';
+            showCopyModal('饿了么0.01喝奶茶', coupon, '淘宝闪购');
+        }
+
+        function openElemeExtreme() {
+            showSuccessToast('正在跳转饿了么18.8极限暴涨...');
+            openInNewTabOrSelf('https://kzurl07.cn/7zjKd1');
+        }
+
+        function openElemeHotSale() {
+            showSuccessToast('正在复制爆品团口令...');
+            const coupon = '98 HU7405   666:/4RSy4j6oc6e十闪购爆品团';
+            showCopyModal('饿了么爆品团', coupon, '淘宝闪购');
+        }
+
+        function openElemeDaily() {
+            showSuccessToast('正在复制天天领红包口令...');
+            const coupon = '57 HU7405   2:/0GOI4j6Mvox三天天来闪购 下单抽免单';
+            showCopyModal('饿了么天天领红包', coupon, '淘宝闪购');
+        }
+
+        function openElemeDailyBonus() {
+            showSuccessToast('正在跳转饿了么天天领翻倍红包...');
+            openInNewTabOrSelf('https://5kma.cn/7zjWLn');
+        }
+
+        // 美团外卖功能
+        function openMeituanFestival() {
+            showSuccessToast('正在跳转美团外卖节...');
+            openInNewTabOrSelf('https://kzurl02.cn/7zqfAn');
+        }
+
+        function openMeituanTaster() {
+            showSuccessToast('正在跳转美团试吃官...');
+            openInNewTabOrSelf('https://wxaurl.cn/B4kJlCjxUll');
+        }
+
+        function openMeituanZero() {
+            showSuccessToast('正在跳转0元吃外卖...');
+            openInNewTabOrSelf('https://kzurl14.cn/7zjzK1');
+        }
+
+        function openMeituanDiscount() {
+            showSuccessToast('正在跳转吃喝玩乐限时神价...');
+            openInNewTabOrSelf('https://kurl11.cn/7zj6HX');
+        }
+
+        function openMeituanTenOClock() {
+            showSuccessToast('正在跳转十点爆品疯抢...');
+            openInNewTabOrSelf('https://kurl03.cn/7zj6ya');
+        }
+
+        // 京东外卖功能
+        function openJDNight() {
+            showSuccessToast('正在跳转京东外卖夜宵专场...');
+            openInNewTabOrSelf('https://kzurl15.cn/7zjUNk');
+        }
+
+        function openJDCoffee() {
+            showSuccessToast('正在跳转京东外卖库迪咖啡...');
+            openInNewTabOrSelf('https://5kma.cn/7zjUjz');
+        }
+
+        function openJDTea() {
+            showSuccessToast('正在跳转京东外卖奶茶饮品...');
+            openInNewTabOrSelf('https://2kma.cn/7zjUfT');
+        }
+
+        function openJDBillion() {
+            showSuccessToast('正在跳转京东外卖百亿补贴券...');
+            openInNewTabOrSelf('https://kzurl15.cn/7zjUvh');
+        }
+
+        function openJDGeneral() {
+            showSuccessToast('正在跳转京东外卖综合...');
+            openInNewTabOrSelf('https://kzurl20.cn/7zjUpz');
+        }
+
+        function showCopyModal(title, code, appName) {
+            const modal = document.getElementById('couponModal');
+            modal.querySelector('.modal-title').textContent = title + ' - 口令复制';
+            const codeBox = document.getElementById('couponCode');
+            codeBox.textContent = code;
+            codeBox.onclick = function () { copyText(code).then(() => showSuccessToast('口令已复制')); };
+            const hint = document.getElementById('couponHint');
+            hint.innerHTML = '请打开' + appName + '，在搜索框粘贴上方口令后搜索使用';
+            document.getElementById('openAppBtn').textContent = '我已复制，去打开' + appName;
+            document.getElementById('openAppBtn').onclick = function () { showSuccessToast('请手动切换到 ' + appName + ' 应用'); closeCouponModal(); };
+            modal.style.display = 'block';
+            copyText(code).then(() => showSuccessToast('口令已复制到剪贴板'));
+        }
+
+        function closeCouponModal() { document.getElementById('couponModal').style.display = 'none'; }
+        function closeHelpModal() { document.getElementById('helpModal').style.display = 'none'; }
+
+        function showHelp() { document.getElementById('helpModal').style.display = 'block'; }
+
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        window.onclick = function (e) {
+            ['couponModal','helpModal'].forEach(id => {
+                const modal = document.getElementById(id);
+                if (e.target === modal) modal.style.display = 'none';
+            });
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍜 外卖优惠券聚合</h1>
+            <p>淘宝闪购 + 美团外卖 + 京东外卖，多重优惠等你来领</p>
+            <div class="top-nav">
+                <button class="nav-btn" onclick="goToHome()">外卖优惠券</button>
+                <button class="nav-btn" onclick="goToTravel()">出行优惠</button>
+                <button class="nav-btn" onclick="goToMovie()">电影优惠</button>
+            </div>
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-number" data-target="15" data-suffix="+">0</span>
+                    <span class="stat-label">优惠券</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-target="999" data-suffix="+">0</span>
+                    <span class="stat-label">已省金额</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-target="20" data-suffix="k+">0</span>
+                    <span class="stat-label">活跃用户</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="browserWarning" class="browser-warning">检测到微信内打开，为保证跳转体验，请使用系统默认浏览器打开本页。</div>
+
+        <!-- 饿了么闪购 - 置顶推荐 -->
+        <div class="platform-section">
+            <div class="platform-header">
+                <div class="platform-info">
+                    <div class="platform-icon" style="background:linear-gradient(135deg,#FF6A00,#E65100); color:#fff;">淘宝</div>
+                    <div>
+                        <div class="platform-title">饿了么闪购</div>
+                        <div class="platform-subtitle">淘宝闪购入口</div>
+                    </div>
+                </div>
+                <div class="platform-badge top">置顶推荐</div>
+            </div>
+            <div class="coupon-grid">
+                <div class="coupon-item" onclick="openElemeNewUser()">
+                    <div class="coupon-header">
+                        <div class="coupon-title">🆓 新用户免单</div>
+                        <div class="coupon-amount">🔥🔥</div>
+                    </div>
+                    <div class="coupon-desc">【淘宝闪购】闪购新用户可领首单免单福利</div>
+                    <div class="coupon-footer">
+                        <span class="tag top">置顶</span>
+                        <div class="coupon-status"><div class="status-dot"></div>有效期至2025-12-31</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openElemeMilkTea()">
+                    <div class="coupon-header">
+                        <div class="coupon-title">🧋 0.01喝奶茶</div>
+                        <div class="coupon-amount">15元</div>
+                    </div>
+                    <div class="coupon-desc">【淘宝闪购】领最高15元大额红包</div>
+                    <div class="coupon-footer">
+                        <span class="tag hot">爆款</span>
+                        <div class="coupon-status"><div class="status-dot"></div>有效期至2025-12-31</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openElemeExtreme()">
+                    <div class="coupon-header">
+                        <div class="coupon-title">💥 18.8极限暴涨</div>
+                        <div class="coupon-amount">18.8元</div>
+                    </div>
+                    <div class="coupon-desc">【饿了么】18.8极限暴涨，有海报</div>
+                    <div class="coupon-footer">
+                        <span class="tag hot">极限</span>
+                        <div class="coupon-status"><div class="status-dot"></div>限时活动</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openElemeHotSale()">
+                    <div class="coupon-header">
+                        <div class="coupon-title">🔥 爆品团</div>
+                        <div class="coupon-amount">爆品</div>
+                    </div>
+                    <div class="coupon-desc">淘宝闪购爆品团，限时抢购</div>
+                    <div class="coupon-footer">
+                        <span class="tag stack">爆品</span>
+                        <div class="coupon-status"><div class="status-dot"></div>有效期至2025-12-31</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openElemeDaily()">
+                    <div class="coupon-header">
+                        <div class="coupon-title">🎁 天天领红包</div>
+                        <div class="coupon-amount">抽免单</div>
+                    </div>
+                    <div class="coupon-desc">天天来闪购，下单抽免单</div>
+                    <div class="coupon-footer">
+                        <span class="tag new">每日</span>
+                        <div class="coupon-status"><div class="status-dot"></div>有效期至2025-12-31</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openElemeDailyBonus()">
+                    <div class="coupon-header">
+                        <div class="coupon-title">🎯 天天领翻倍红包</div>
+                        <div class="coupon-amount">20元</div>
+                    </div>
+                    <div class="coupon-desc">【饿了么】天天领翻倍红包，最高20元无门槛红包！</div>
+                    <div class="coupon-footer">
+                        <span class="tag hot">翻倍</span>
+                        <div class="coupon-status"><div class="status-dot"></div>有效期至2026-07-31</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 美团外卖 -->
+        <div class="platform-section">
+            <div class="platform-header">
+                <div class="platform-info">
+                    <div class="platform-icon" style="background:linear-gradient(135deg,#FFD100,#FFA000); color:#333;">美团</div>
+                    <div>
+                        <div class="platform-title">美团外卖</div>
+                        <div class="platform-subtitle">大额通用红包</div>
+                    </div>
+                </div>
+                <div class="platform-badge">HOT</div>
+            </div>
+            <div class="coupon-grid">
+                <div class="coupon-item" onclick="openMeituanFestival()">
+                    <div class="coupon-header">
+                        <div class="coupon-title">🎉 美团外卖节</div>
+                        <div class="coupon-amount">🔥🔥</div>
+                    </div>
+                    <div class="coupon-desc">【美团外卖红包】美团外卖节，帮你吃更好</div>
+                    <div class="coupon-footer">
+                        <span class="tag hot">热门</span>
+                        <div class="coupon-status"><div class="status-dot"></div>有效期至2025-12-31</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openMeituanTaster()">
+                    <div class="coupon-header">
+                        <div class="coupon-title">👑 美团试吃官</div>
+                        <div class="coupon-amount">🔥</div>
+                    </div>
+                    <div class="coupon-desc">美团试吃官专属优惠活动</div>
+                    <div class="coupon-footer">
+                        <span class="tag new">新活动</span>
+                        <div class="coupon-status"><div class="status-dot"></div>有效期至2025-09-30</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openMeituanZero()">
+                    <div class="coupon-header">
+                        <div class="coupon-title">💰 最低0元吃外卖</div>
+                        <div class="coupon-amount">0元</div>
+                    </div>
+                    <div class="coupon-desc">【美团商家超级返活动】下单返现金，全网优惠均可叠加</div>
+                    <div class="coupon-footer">
+                        <span class="tag stack">可叠加</span>
+                        <div class="coupon-status"><div class="status-dot"></div>有效期至2025-12-31</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openMeituanDiscount()">
+                    <div class="coupon-header">
+                        <div class="coupon-title">🏷️ 吃喝玩乐限时神价</div>
+                        <div class="coupon-amount">2折起</div>
+                    </div>
+                    <div class="coupon-desc">全场爆品2折起！速抢</div>
+                    <div class="coupon-footer">
+                        <span class="tag hot">限时</span>
+                        <div class="coupon-status"><div class="status-dot"></div>有效期至2025-12-31</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openMeituanTenOClock()">
+                    <div class="coupon-header">
+                        <div class="coupon-title">⏰ 十点爆品疯抢</div>
+                        <div class="coupon-amount">疯抢</div>
+                    </div>
+                    <div class="coupon-desc">先领券再下单，十点爆品疯抢！</div>
+                    <div class="coupon-footer">
+                        <span class="tag new">每日</span>
+                        <div class="coupon-status"><div class="status-dot"></div>有效期至2025-09-01</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 京东外卖 -->
+        <div class="platform-section">
+            <div class="platform-header">
+                <div class="platform-info">
+                    <div class="platform-icon" style="background:linear-gradient(135deg,#E1251B,#C62828); color:#fff;">京东</div>
+                    <div>
+                        <div class="platform-title">京东外卖</div>
+                        <div class="platform-subtitle">品质保障</div>
+                    </div>
+                </div>
+                <div class="platform-badge">推荐</div>
+            </div>
+            <div class="coupon-grid">
+                <div class="coupon-item" onclick="openJDNight()">
+                    <div class="coupon-header">
+                        <div class="coupon-title">🌙 夜宵专场</div>
+                        <div class="coupon-amount">10元</div>
+                    </div>
+                    <div class="coupon-desc">【京东外卖】夜宵专场，每日20-24点，加领10元优惠券</div>
+                    <div class="coupon-footer">
+                        <span class="tag hot">夜宵</span>
+                        <div class="coupon-status"><div class="status-dot"></div>有效期至2025-12-31</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openJDCoffee()">
+                    <div class="coupon-header">
+                        <div class="coupon-title">☕ 库迪咖啡</div>
+                        <div class="coupon-amount">3.9元</div>
+                    </div>
+                    <div class="coupon-desc">【京东外卖】库迪全网最低价低至3.9元，价格限量，先到先得</div>
+                    <div class="coupon-footer">
+                        <span class="tag new">限量</span>
+                        <div class="coupon-status"><div class="status-dot"></div>有效期至2025-12-31</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openJDTea()">
+                    <div class="coupon-header">
+                        <div class="coupon-title">🧋 奶茶饮品</div>
+                        <div class="coupon-amount">3.9元</div>
+                    </div>
+                    <div class="coupon-desc">【京东外卖】茶百道奶茶全网最低价低至3.9元，价格限量，先到先得</div>
+                    <div class="coupon-footer">
+                        <span class="tag hot">奶茶</span>
+                        <div class="coupon-status"><div class="status-dot"></div>有效期至2025-12-31</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openJDBillion()">
+                    <div class="coupon-header">
+                        <div class="coupon-title">💰 百亿补贴券</div>
+                        <div class="coupon-amount">20元</div>
+                    </div>
+                    <div class="coupon-desc">【京东外卖】20元外卖百亿补贴券</div>
+                    <div class="coupon-footer">
+                        <span class="tag stack">补贴</span>
+                        <div class="coupon-status"><div class="status-dot"></div>限时活动</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openJDGeneral()">
+                    <div class="coupon-header">
+                        <div class="coupon-title">🛍️ 综合优惠</div>
+                        <div class="coupon-amount">19.9元</div>
+                    </div>
+                    <div class="coupon-desc">【京东外卖】餐饮鱼你在一起低至19.9元</div>
+                    <div class="coupon-footer">
+                        <span class="tag new">综合</span>
+                        <div class="coupon-status"><div class="status-dot"></div>限时优惠</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="floating-help" onclick="showHelp()">?</div>
+    <div id="successToast" class="success-toast">操作成功！</div>
+
+    <div id="couponModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">口令复制</div>
+            <div id="couponCode" class="coupon-code"></div>
+            <div id="couponHint" style="color:#666; font-size:14px; line-height:1.6; margin-bottom: 12px;"></div>
+            <button class="btn-secondary btn" onclick="closeCouponModal()">我知道了</button>
+            <button id="openAppBtn" class="btn">去打开应用</button>
+        </div>
+    </div>
+
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">使用帮助</div>
+            <div style="text-align:left;color:#666;line-height:1.7;">
+                <p>• 饿了么闪购：复制口令后在淘宝闪购中使用</p>
+                <p>• 美团外卖：点击直接跳转到相应优惠页面</p>
+                <p>• 京东外卖：点击直接跳转到相应优惠页面</p>
+                <p>• 若在微信内打开，建议使用系统默认浏览器打开本页</p>
+                <p>• 部分优惠券可以叠加使用，建议先领取再下单</p>
+            </div>
+            <button class="btn" onclick="closeHelpModal()">知道了</button>
+        </div>
+    </div>
+</body>
+</html>
+
+
+

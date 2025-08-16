@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>出行优惠</title>
+    <link rel="stylesheet" href="./assets/styles/common.css">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:linear-gradient(135deg,#667eea,#764ba2);color:#eaeaea;padding:22px 16px}
+        .container{max-width:560px;margin:0 auto}
+        .header{text-align:center;margin-bottom:22px}
+        .title{font-size:26px;font-weight:800;letter-spacing:1px;text-shadow:0 2px 6px rgba(0,0,0,.25)}
+        .sub{opacity:.9;margin-top:6px}
+        .top-nav{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+        .nav-btn{background:rgba(255,255,255,.22);color:#fff;border:1px solid rgba(255,255,255,.35);padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer}
+
+        /* 参考外卖优惠券页面的设计风格 */
+        .platform-section{background:#fff;border-radius:18px;padding:22px;margin-bottom:18px;box-shadow:0 10px 28px rgba(0,0,0,.15)}
+        .platform-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+        .platform-info{display:flex;align-items:center}
+        .platform-icon{width:42px;height:42px;border-radius:12px;margin-right:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;background:linear-gradient(135deg,#4e54c8,#8f94fb)}
+        .platform-title{font-size:18px;font-weight:600;color:#333}
+        .platform-subtitle{font-size:13px;color:#666;margin-top:2px}
+        .platform-badge{background:linear-gradient(135deg,#ff6b6b,#ee5a52);color:#fff;padding:6px 12px;border-radius:14px;font-size:12px;font-weight:600}
+
+        .coupon-grid{display:grid;grid-template-columns:1fr;gap:14px}
+        .coupon-item{background:linear-gradient(135deg,#f8f9ff 0%,#eef1ff 100%);border:2px solid #e5e9ff;border-radius:14px;padding:16px;cursor:pointer;transition:all .25s ease;position:relative;overflow:hidden}
+        .coupon-item:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(0,0,0,.12)}
+        .coupon-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+        .coupon-title{font-size:16px;font-weight:600;color:#333}
+        .coupon-amount{background:#ff4757;color:#fff;padding:4px 8px;border-radius:8px;font-size:12px;font-weight:600;margin-left:8px}
+        .coupon-desc{font-size:14px;color:#666;line-height:1.5;margin-bottom:10px}
+        .coupon-footer{display:flex;align-items:center;justify-content:space-between}
+        .tag{display:inline-block;color:#fff;font-size:11px;padding:4px 10px;border-radius:12px;font-weight:600}
+        .tag.hot{background:linear-gradient(135deg,#ff6b6b,#ee5a52)}
+        .tag.new{background:linear-gradient(135deg,#4ecdc4,#44a08d)}
+        .tag.stack{background:linear-gradient(135deg,#45b7d1,#2196F3)}
+        .tag.top{background:linear-gradient(135deg,#FFD700,#FFA500);color:#333}
+        .status-dot{width:6px;height:6px;border-radius:50%;background:#4caf50;margin-right:6px}
+        .coupon-status{font-size:12px;color:#999;display:flex;align-items:center}
+
+        /* 公告弹窗样式 */
+        .announcement-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .announcement-content {
+            background: linear-gradient(135deg, #fff, #f8f9ff);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            margin: 10% auto;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: announceSlideIn 0.6s ease-out;
+            border: 3px solid #FFD700;
+        }
+        
+        @keyframes announceSlideIn {
+            from { transform: translateY(-50px) scale(0.9); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        
+        .announcement-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #333;
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .announcement-text {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .announcement-highlight {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #333;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            margin: 15px 0;
+            box-shadow: 0 4px 12px rgba(255,215,0,0.3);
+        }
+        
+        .announcement-date {
+            font-size: 14px;
+            color: #999;
+            margin-top: 15px;
+            font-style: italic;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #007AFF, #0056cc);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 22px;
+            font-size: 15px;
+            cursor: pointer;
+            margin: 6px;
+            font-weight: 600;
+        }
+    </style>
+    <script src="./assets/scripts/common.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">✈️ 出行优惠</div>
+            <div class="sub">机票、打车、火车、住宿多重优惠等你来领</div>
+            <div class="top-nav">
+                <button class="nav-btn" onclick="navTo('./index.html')">外卖优惠券</button>
+                <button class="nav-btn" onclick="navTo('./travel.html')">出行优惠</button>
+                <button class="nav-btn" onclick="navTo('./movie.html')">电影优惠</button>
+            </div>
+        </div>
+
+        <!-- 打车优惠 -->
+        <div class="platform-section">
+            <div class="platform-header">
+                <div class="platform-info">
+                    <div class="platform-icon" style="background:linear-gradient(135deg,#FF6A00,#E65100);">🚗</div>
+                    <div>
+                        <div class="platform-title">打车优惠</div>
+                        <div class="platform-subtitle">花小猪、滴滴、T3出行、同程打车</div>
+                    </div>
+                </div>
+                <div class="platform-badge">热门</div>
+            </div>
+            <div class="coupon-grid">
+                <div class="coupon-item" onclick="openLink('https://kurl01.cn/7zVfz2')">
+                    <div class="coupon-header">
+                        <div class="coupon-title">花小猪首单立减</div>
+                        <div class="coupon-amount">首单立减</div>
+                    </div>
+                    <div class="coupon-desc">【花小猪打车】出行打车？先来领个出行大礼包，全员可享免费领</div>
+                    <div class="coupon-footer">
+                        <span class="tag hot">爆款</span>
+                        <div class="coupon-status"><div class="status-dot"></div>新用户专享</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openLink('https://kzurl16.cn/7zqQao')">
+                    <div class="coupon-header">
+                        <div class="coupon-title">滴滴网约车</div>
+                        <div class="coupon-amount">最高100元</div>
+                    </div>
+                    <div class="coupon-desc">【滴滴打车】出行打车？先来领个出行大礼包，最高100元，全员可享免费领</div>
+                    <div class="coupon-footer">
+                        <span class="tag stack">可叠加</span>
+                        <div class="coupon-status"><div class="status-dot"></div>全员可享</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openLink('https://kzurl02.cn/7zVQsQ')">
+                    <div class="coupon-header">
+                        <div class="coupon-title">T3出行</div>
+                        <div class="coupon-amount">百元礼包</div>
+                    </div>
+                    <div class="coupon-desc">【T3出行】每天领取百元超值礼包，单单优惠享不停</div>
+                    <div class="coupon-footer">
+                        <span class="tag new">每日</span>
+                        <div class="coupon-status"><div class="status-dot"></div>天天可领</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openLink('https://kzurl17.cn/7zVQ9c')">
+                    <div class="coupon-header">
+                        <div class="coupon-title">同程打车顺风车</div>
+                        <div class="coupon-amount">全国360+城</div>
+                    </div>
+                    <div class="coupon-desc">【同程打车】用车业务现覆盖全国360+座城市，为用户提供全面便捷出行服务</div>
+                    <div class="coupon-footer">
+                        <span class="tag hot">全国</span>
+                        <div class="coupon-status"><div class="status-dot"></div>全国通用</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 机票优惠 -->
+        <div class="platform-section">
+            <div class="platform-header">
+                <div class="platform-info">
+                    <div class="platform-icon" style="background:linear-gradient(135deg,#4CAF50,#45a049);">✈️</div>
+                    <div>
+                        <div class="platform-title">机票优惠</div>
+                        <div class="platform-subtitle">同程、美团、飞猪机票特惠</div>
+                    </div>
+                </div>
+                <div class="platform-badge">特价</div>
+            </div>
+            <div class="coupon-grid">
+                <div class="coupon-item" onclick="openLink('https://kzurl02.cn/7zVQgj')">
+                    <div class="coupon-header">
+                        <div class="coupon-title">同程机票</div>
+                        <div class="coupon-amount">1折起</div>
+                    </div>
+                    <div class="coupon-desc">【同程机票】特价机票1折起</div>
+                    <div class="coupon-footer">
+                        <span class="tag hot">特价</span>
+                        <div class="coupon-status"><div class="status-dot"></div>全球航线</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openLink('https://kurl01.cn/7zVQyX')">
+                    <div class="coupon-header">
+                        <div class="coupon-title">美团机票</div>
+                        <div class="coupon-amount">1折起</div>
+                    </div>
+                    <div class="coupon-desc">【美团】夏日慢慢游出行机票一折起，最高立减100元</div>
+                    <div class="coupon-footer">
+                        <span class="tag new">夏日</span>
+                        <div class="coupon-status"><div class="status-dot"></div>最高立减100元</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openLink('https://kzurl13.cn/7zVQIl')">
+                    <div class="coupon-header">
+                        <div class="coupon-title">飞猪机票</div>
+                        <div class="coupon-amount">安心购票</div>
+                    </div>
+                    <div class="coupon-desc">【飞猪】飞猪机票安心购票、便捷出行，搭配券包更划算</div>
+                    <div class="coupon-footer">
+                        <span class="tag stack">券包</span>
+                        <div class="coupon-status"><div class="status-dot"></div>安心保障</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 火车票优惠 -->
+        <div class="platform-section">
+            <div class="platform-header">
+                <div class="platform-info">
+                    <div class="platform-icon" style="background:linear-gradient(135deg,#2196F3,#1976D2);">🚄</div>
+                    <div>
+                        <div class="platform-title">火车票优惠</div>
+                        <div class="platform-subtitle">美团火车票福利</div>
+                    </div>
+                </div>
+                <div class="platform-badge">福利</div>
+            </div>
+            <div class="coupon-grid">
+                <div class="coupon-item" onclick="openLink('https://kzurl18.cn/7zVQOL')">
+                    <div class="coupon-header">
+                        <div class="coupon-title">美团火车票</div>
+                        <div class="coupon-amount">10元券</div>
+                    </div>
+                    <div class="coupon-desc">【美团】火车票福利神器，领10元券</div>
+                    <div class="coupon-footer">
+                        <span class="tag hot">神器</span>
+                        <div class="coupon-status"><div class="status-dot"></div>全国通用</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 住宿优惠 -->
+        <div class="platform-section">
+            <div class="platform-header">
+                <div class="platform-info">
+                    <div class="platform-icon" style="background:linear-gradient(135deg,#9C27B0,#7B1FA2);">🏨</div>
+                    <div>
+                        <div class="platform-title">住宿优惠</div>
+                        <div class="platform-subtitle">同程酒店、民宿特惠</div>
+                    </div>
+                </div>
+                <div class="platform-badge">特惠</div>
+            </div>
+            <div class="coupon-grid">
+                <div class="coupon-item" onclick="openLink('https://kzurl11.cn/7zVYH4')">
+                    <div class="coupon-header">
+                        <div class="coupon-title">同程酒店</div>
+                        <div class="coupon-amount">最高100元</div>
+                    </div>
+                    <div class="coupon-desc">【同程酒店】热门精选 天天特惠，领红包 订酒店，最高立减100元</div>
+                    <div class="coupon-footer">
+                        <span class="tag hot">热门</span>
+                        <div class="coupon-status"><div class="status-dot"></div>天天特惠</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openLink('https://2kma.cn/7zVY9V')">
+                    <div class="coupon-header">
+                        <div class="coupon-title">同程酒店预售房&通兑券</div>
+                        <div class="coupon-amount">69元起</div>
+                    </div>
+                    <div class="coupon-desc">抢爆款预售！全国万店通兑券69元起，大牌特惠预售房暑期&周未不加价，过期退随时退，超长有效期</div>
+                    <div class="coupon-footer">
+                        <span class="tag top">爆款</span>
+                        <div class="coupon-status"><div class="status-dot"></div>过期退</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openLink('https://kurl15.cn/7zVYTG')">
+                    <div class="coupon-header">
+                        <div class="coupon-title">同程酒店百元好房</div>
+                        <div class="coupon-amount">百元好房</div>
+                    </div>
+                    <div class="coupon-desc">酒店晚晚不过百，百元好房等你来!</div>
+                    <div class="coupon-footer">
+                        <span class="tag new">百元</span>
+                        <div class="coupon-status"><div class="status-dot"></div>晚晚不过百</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openLink('https://4kma.cn/7zVYSr')">
+                    <div class="coupon-header">
+                        <div class="coupon-title">同程民宿</div>
+                        <div class="coupon-amount">3折起</div>
+                    </div>
+                    <div class="coupon-desc">特惠甩卖，3折起!</div>
+                    <div class="coupon-footer">
+                        <span class="tag hot">甩卖</span>
+                        <div class="coupon-status"><div class="status-dot"></div>限时特惠</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 公告弹窗 -->
+    <div id="announcementModal" class="announcement-modal">
+        <div class="announcement-content">
+            <div class="announcement-title" id="announcementTitle">🌞 美好的一天开始了</div>
+            <div class="announcement-text" id="announcementText">今天也要开开心心的哦！记得给自己一个微笑，让生活充满阳光。</div>
+            <div class="announcement-highlight" id="announcementHighlight">💝 温馨提示：记得按时吃饭，保持好心情！</div>
+            <div class="announcement-date" id="announcementDate">2024年1月1日</div>
+            <div style="margin-top: 20px;">
+                <button class="btn" onclick="closeAnnouncement()">我知道了</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openLink(url){ 
+            try{ 
+                const w=window.open(url,'_blank'); 
+                setTimeout(()=>{ 
+                    if(!w||w.closed||typeof w.closed==='undefined'){ 
+                        window.location.href=url; 
+                    } 
+                },600); 
+            }catch{ 
+                window.location.href=url; 
+            } 
+        }
+    </script>
+</body>
+</html>
+
+

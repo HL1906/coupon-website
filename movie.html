@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电影优惠</title>
+    <link rel="stylesheet" href="./assets/styles/common.css">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:linear-gradient(135deg,#667eea,#764ba2);color:#eaeaea;padding:22px 16px}
+        .container{max-width:560px;margin:0 auto}
+        .header{text-align:center;margin-bottom:22px}
+        .title{font-size:26px;font-weight:800;letter-spacing:1px;text-shadow:0 2px 6px rgba(0,0,0,.25)}
+        .sub{opacity:.9;margin-top:6px}
+        .top-nav{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+        .nav-btn{background:rgba(255,255,255,.22);color:#fff;border:1px solid rgba(255,255,255,.35);padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer}
+
+        /* 参考外卖优惠券页面的设计风格 */
+        .platform-section{background:#fff;border-radius:18px;padding:22px;margin-bottom:18px;box-shadow:0 10px 28px rgba(0,0,0,.15)}
+        .platform-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+        .platform-info{display:flex;align-items:center}
+        .platform-icon{width:42px;height:42px;border-radius:12px;margin-right:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;background:linear-gradient(135deg,#4e54c8,#8f94fb)}
+        .platform-title{font-size:18px;font-weight:600;color:#333}
+        .platform-subtitle{font-size:13px;color:#666;margin-top:2px}
+        .platform-badge{background:linear-gradient(135deg,#ff6b6b,#ee5a52);color:#fff;padding:6px 12px;border-radius:14px;font-size:12px;font-weight:600}
+
+        .coupon-grid{display:grid;grid-template-columns:1fr;gap:14px}
+        .coupon-item{background:linear-gradient(135deg,#f8f9ff 0%,#eef1ff 100%);border:2px solid #e5e9ff;border-radius:14px;padding:16px;cursor:pointer;transition:all .25s ease;position:relative;overflow:hidden}
+        .coupon-item:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(0,0,0,.12)}
+        .coupon-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+        .coupon-title{font-size:16px;font-weight:600;color:#333}
+        .coupon-amount{background:#ff4757;color:#fff;padding:4px 8px;border-radius:8px;font-size:12px;font-weight:600;margin-left:8px}
+        .coupon-desc{font-size:14px;color:#666;line-height:1.5;margin-bottom:10px}
+        .coupon-footer{display:flex;align-items:center;justify-content:space-between}
+        .tag{display:inline-block;color:#fff;font-size:11px;padding:4px 10px;border-radius:12px;font-weight:600}
+        .tag.hot{background:linear-gradient(135deg,#ff6b6b,#ee5a52)}
+        .tag.new{background:linear-gradient(135deg,#4ecdc4,#44a08d)}
+        .tag.stack{background:linear-gradient(135deg,#45b7d1,#2196F3)}
+        .tag.top{background:linear-gradient(135deg,#FFD700,#FFA500);color:#333}
+        .status-dot{width:6px;height:6px;border-radius:50%;background:#4caf50;margin-right:6px}
+        .coupon-status{font-size:12px;color:#999;display:flex;align-items:center}
+    </style>
+    <script src="./assets/scripts/common.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">🎬 电影优惠</div>
+            <div class="sub">电影票优惠券，比美团、淘票票更实惠</div>
+            <div class="top-nav">
+                <button class="nav-btn" onclick="navTo('./index.html')">外卖优惠券</button>
+                <button class="nav-btn" onclick="navTo('./travel.html')">出行优惠</button>
+                <button class="nav-btn" onclick="navTo('./movie.html')">电影优惠</button>
+            </div>
+        </div>
+
+        <!-- 电影票优惠 -->
+        <div class="platform-section">
+            <div class="platform-header">
+                <div class="platform-info">
+                    <div class="platform-icon" style="background:linear-gradient(135deg,#E91E63,#C2185B);">🎬</div>
+                    <div>
+                        <div class="platform-title">电影票优惠</div>
+                        <div class="platform-subtitle">比美团、淘票票更实惠</div>
+                    </div>
+                </div>
+                <div class="platform-badge">特惠</div>
+            </div>
+            <div class="coupon-grid">
+                <div class="coupon-item" onclick="openLink('https://kzurl16.cn/7zVYZu')">
+                    <div class="coupon-header">
+                        <div class="coupon-title">电影票活动1</div>
+                        <div class="coupon-amount">8折起</div>
+                    </div>
+                    <div class="coupon-desc">【电影票】电影票价为市场主流APP售价的8折起，每张票便宜5-20元</div>
+                    <div class="coupon-footer">
+                        <span class="tag hot">特价</span>
+                        <div class="coupon-status"><div class="status-dot"></div>便宜5-20元</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openLink('https://kurl02.cn/7zinXD')">
+                    <div class="coupon-header">
+                        <div class="coupon-title">电影票活动2</div>
+                        <div class="coupon-amount">折上折</div>
+                    </div>
+                    <div class="coupon-desc">【电影票】电影票折上折优惠，比美团，淘票票更实惠，看电影超省钱，全国通用</div>
+                    <div class="coupon-footer">
+                        <span class="tag stack">折上折</span>
+                        <div class="coupon-status"><div class="status-dot"></div>全国通用</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openLink('https://kzurl20.cn/7zVYrX')">
+                    <div class="coupon-header">
+                        <div class="coupon-title">淘票票红包</div>
+                        <div class="coupon-amount">最高30元</div>
+                    </div>
+                    <div class="coupon-desc">最高30元红包</div>
+                    <div class="coupon-footer">
+                        <span class="tag new">红包</span>
+                        <div class="coupon-status"><div class="status-dot"></div>大额红包</div>
+                    </div>
+                </div>
+                <div class="coupon-item" onclick="openLink('https://kzurl07.cn/7zinkM')">
+                    <div class="coupon-header">
+                        <div class="coupon-title">淘票票买券</div>
+                        <div class="coupon-amount">0.1元起</div>
+                    </div>
+                    <div class="coupon-desc">【淘票票买券】0.1买10元代金券，5.9元买24.9元全时段观影券</div>
+                    <div class="coupon-footer">
+                        <span class="tag top">超值</span>
+                        <div class="coupon-status"><div class="status-dot"></div>全时段观影</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openLink(url){ 
+            try{ 
+                const w=window.open(url,'_blank'); 
+                setTimeout(()=>{ 
+                    if(!w||w.closed||typeof w.closed==='undefined'){ 
+                        window.location.href=url; 
+                    } 
+                },600); 
+            }catch{ 
+                window.location.href=url; 
+            } 
+        }
+    </script>
+</body>
+</html>
+
+
